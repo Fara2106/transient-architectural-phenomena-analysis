@@ -1,0 +1,1 @@
+g++ random_access_array.cc -o random_access_array -O3
