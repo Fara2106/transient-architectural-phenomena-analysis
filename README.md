@@ -58,32 +58,38 @@ project/
 │   │   │   │   ├── client.cc
 │   │   │   │   ├── makefile
 │   │   │   │   ├── benchmark_cache.sh
-│   │   │   │   └── results/      # Results for each table size
-│   │   │   │       ├── cache_10K.txt      # 10,000 rows
-│   │   │   │       ├── cache_50K.txt      # 50,000 rows
-│   │   │   │       ├── cache_100K.txt     # 100,000 rows
-│   │   │   │       ├── cache_500K.txt     # 500,000 rows
-│   │   │   │       └── cache_1M.txt       # 1,000,000 rows
+│   │   │   │   └── results/      # Results organized by disturbance type
+│   │   │   │       ├── misses_baseline.txt     # No disturbance
+│   │   │   │       ├── misses_1_LOWHZ.txt      # 1 disturbing server, low freq
+│   │   │   │       ├── misses_1_MEDIUMHZ.txt   # 1 disturbing server, medium freq
+│   │   │   │       ├── misses_1_HIGHHZ.txt     # 1 disturbing server, high freq
+│   │   │   │       ├── misses_2_LOWHZ.txt      # 2 disturbing servers, low freq
+│   │   │   │       ├── misses_2_MEDIUMHZ.txt   # 2 disturbing servers, medium freq
+│   │   │   │       └── misses_2_HIGHHZ.txt     # 2 disturbing servers, high freq
 │   │   │   ├── tlb_miss/
 │   │   │   │   ├── client.cc
 │   │   │   │   ├── makefile
 │   │   │   │   ├── benchmark_tlb.sh
-│   │   │   │   └── results/      # Results for each table size
-│   │   │   │       ├── tlb_10K.txt        # 10,000 rows
-│   │   │   │       ├── tlb_50K.txt        # 50,000 rows
-│   │   │   │       ├── tlb_100K.txt       # 100,000 rows
-│   │   │   │       ├── tlb_500K.txt       # 500,000 rows
-│   │   │   │       └── tlb_1M.txt         # 1,000,000 rows
+│   │   │   │   └── results/      # Results organized by disturbance type
+│   │   │   │       ├── tlb_baseline.txt        # No disturbance
+│   │   │   │       ├── tlb_1_LOWHZ.txt         # 1 disturbing server, low freq
+│   │   │   │       ├── tlb_1_MEDIUMHZ.txt      # 1 disturbing server, medium freq
+│   │   │   │       ├── tlb_1_HIGHHZ.txt        # 1 disturbing server, high freq
+│   │   │   │       ├── tlb_2_LOWHZ.txt         # 2 disturbing servers, low freq
+│   │   │   │       ├── tlb_2_MEDIUMHZ.txt      # 2 disturbing servers, medium freq
+│   │   │   │       └── tlb_2_HIGHHZ.txt        # 2 disturbing servers, high freq
 │   │   │   └── execution_time/
 │   │   │       ├── client.cc
 │   │   │       ├── makefile
 │   │   │       ├── benchmark_time.sh
-│   │   │       └── results/      # Execution times for each table size
-│   │   │           ├── time_10K.txt       # 10,000 rows
-│   │   │           ├── time_50K.txt       # 50,000 rows
-│   │   │           ├── time_100K.txt      # 100,000 rows
-│   │   │           ├── time_500K.txt      # 500,000 rows
-│   │   │           └── time_1M.txt        # 1,000,000 rows
+│   │   │       └── results/      # Execution times organized by disturbance type
+│   │   │           ├── time_baseline.txt       # No disturbance
+│   │   │           ├── time_1_LOWHZ.txt        # 1 disturbing server, low freq
+│   │   │           ├── time_1_MEDIUMHZ.txt     # 1 disturbing server, medium freq
+│   │   │           ├── time_1_HIGHHZ.txt       # 1 disturbing server, high freq
+│   │   │           ├── time_2_LOWHZ.txt        # 2 disturbing servers, low freq
+│   │   │           ├── time_2_MEDIUMHZ.txt     # 2 disturbing servers, medium freq
+│   │   │           └── time_2_HIGHHZ.txt       # 2 disturbing servers, high freq
 │   │   ├── multi_core/
 │   │   │   ├── cache_miss/
 │   │   │   │   └── results/      # Same structure as single_core
@@ -108,32 +114,38 @@ project/
 │       │   │   ├── client.cc
 │       │   │   ├── makefile
 │       │   │   ├── benchmark_cache.sh
-│       │   │   └── results/      # Results for each matrix size
-│       │   │       ├── cache_1x1.txt      # 1x1 matrix
-│       │   │       ├── cache_64x64.txt    # 64x64 matrix
-│       │   │       ├── cache_256x256.txt  # 256x256 matrix
-│       │   │       ├── cache_1024x1024.txt # 1024x1024 matrix
-│       │   │       └── cache_4096x4096.txt # 4096x4096 matrix
+│       │   │   └── results/      # Results organized by disturbance type
+│       │   │       ├── misses_baseline.txt     # No disturbance
+│       │   │       ├── misses_1_LOWHZ.txt      # 1 disturbing server, low freq
+│       │   │       ├── misses_1_MEDIUMHZ.txt   # 1 disturbing server, medium freq
+│       │   │       ├── misses_1_HIGHHZ.txt     # 1 disturbing server, high freq
+│       │   │       ├── misses_2_LOWHZ.txt      # 2 disturbing servers, low freq
+│       │   │       ├── misses_2_MEDIUMHZ.txt   # 2 disturbing servers, medium freq
+│       │   │       └── misses_2_HIGHHZ.txt     # 2 disturbing servers, high freq
 │       │   ├── tlb_miss/
 │       │   │   ├── client.cc
 │       │   │   ├── makefile
 │       │   │   ├── benchmark_tlb.sh
-│       │   │   └── results/      # Results for each matrix size
-│       │   │       ├── tlb_1x1.txt        # 1x1 matrix
-│       │   │       ├── tlb_64x64.txt      # 64x64 matrix
-│       │   │       ├── tlb_256x256.txt    # 256x256 matrix
-│       │   │       ├── tlb_1024x1024.txt  # 1024x1024 matrix
-│       │   │       └── tlb_4096x4096.txt  # 4096x4096 matrix
+│       │   │   └── results/      # Results organized by disturbance type
+│       │   │       ├── tlb_baseline.txt        # No disturbance
+│       │   │       ├── tlb_1_LOWHZ.txt         # 1 disturbing server, low freq
+│       │   │       ├── tlb_1_MEDIUMHZ.txt      # 1 disturbing server, medium freq
+│       │   │       ├── tlb_1_HIGHHZ.txt        # 1 disturbing server, high freq
+│       │   │       ├── tlb_2_LOWHZ.txt         # 2 disturbing servers, low freq
+│       │   │       ├── tlb_2_MEDIUMHZ.txt      # 2 disturbing servers, medium freq
+│       │   │       └── tlb_2_HIGHHZ.txt        # 2 disturbing servers, high freq
 │       │   └── execution_time/
 │       │       ├── client.cc
 │       │       ├── makefile
 │       │       ├── benchmark_time.sh
-│       │       └── results/      # Execution times for each matrix size
-│       │           ├── time_1x1.txt       # 1x1 matrix
-│       │           ├── time_64x64.txt     # 64x64 matrix
-│       │           ├── time_256x256.txt   # 256x256 matrix
-│       │           ├── time_1024x1024.txt # 1024x1024 matrix
-│       │           └── time_4096x4096.txt # 4096x4096 matrix
+│       │       └── results/      # Execution times organized by disturbance type
+│       │           ├── time_baseline.txt       # No disturbance
+│       │           ├── time_1_LOWHZ.txt        # 1 disturbing server, low freq
+│       │           ├── time_1_MEDIUMHZ.txt     # 1 disturbing server, medium freq
+│       │           ├── time_1_HIGHHZ.txt       # 1 disturbing server, high freq
+│       │           ├── time_2_LOWHZ.txt        # 2 disturbing servers, low freq
+│       │           ├── time_2_MEDIUMHZ.txt     # 2 disturbing servers, medium freq
+│       │           └── time_2_HIGHHZ.txt       # 2 disturbing servers, high freq
 │       ├── multi_core/
 │       │   ├── cache_miss/
 │       │   │   └── results/      # Same structure as single_core
@@ -302,6 +314,25 @@ python3 plot_matrix_results.py # For matrix server analysis
 
 # Graphs are saved in respective results/ folders
 ```
+
+## 📊 File Structure and Content
+
+### Validation Results
+Each validation test generates results organized by data structure size:
+- **Cache analysis**: Results for different array sizes (32KB, 256KB, 16MB, etc.)
+- **TLB analysis**: Results for different page counts (64, 1536, 4096 pages, etc.)
+
+### Webserver Results  
+Each webserver test generates results organized by disturbance configuration:
+
+**File naming convention:**
+- `baseline`: Test server only (no disturbance)
+- `1_LOWHZ`: Test server + 1 disturbing server at low frequency  
+- `1_MEDIUMHZ`: Test server + 1 disturbing server at medium frequency
+- `1_HIGHHZ`: Test server + 1 disturbing server at high frequency
+- `2_LOWHZ`: Test server + 2 disturbing servers at low frequency
+- `2_MEDIUMHZ`: Test server + 2 disturbing servers at medium frequency  
+- `2_HIGHHZ`: Test server + 2 disturbing servers at high frequency
 
 ## 📊 Monitored Metrics
 
