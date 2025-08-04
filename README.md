@@ -1,6 +1,6 @@
 # Analysis of Transient Architectural Phenomena
 
-This repository contains the code and tools used for the Master's thesis "Analisi dei Fenomeni Architetturali Transienti" (Analysis of Transient Architectural Phenomena) - University of Siena, Academic Year 2023-2024.
+This repository contains the code and tools used for the thesis "Analisi dei Fenomeni Architetturali Transienti" (Analysis of Transient Architectural Phenomena) - University of Siena, Academic Year 2023-2024.
 
 ## 📋 Project Overview
 
@@ -454,7 +454,7 @@ This research contributes to understanding transient architectural phenomena in 
 ## 👨‍💻 Author
 
 **Lorenzo Faraoni**  
-Master's in Computer and Information Engineering  
+Laurea in Computer and Information Engineering  
 University of Siena  
 
 📧 Email: lorefara97@gmail.com  
