@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "Analysis of Transient Architectural Phenomena"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - given-names: Lorenzo
+    family-names: Faraoni
+    affiliation: "University of Siena"
