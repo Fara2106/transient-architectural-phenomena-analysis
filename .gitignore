@@ -1,22 +1,31 @@
-# Compiled files
-*.class
+# Compiled binaries
 *.o
 *.exe
+random_access_cache
+random_access_tlb
+
+# Java compiled
+*.class
+*.war
+target/
+build/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
 
 # Temporary files
 *.tmp
-*.log
-*~
+*.temp
+.DS_Store
+Thumbs.db
 
 # IDE files
 .vscode/
 .idea/
 *.swp
+*.swo
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Build directories
-build/
-target/
+# Log files
+*.log
