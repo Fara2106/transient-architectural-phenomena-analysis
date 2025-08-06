@@ -1,8 +1,71 @@
 cff-version: 1.2.0
-title: "Analysis of Transient Architectural Phenomena"
 message: "If you use this software, please cite it as below."
 type: software
+title: "Transient Architectural Phenomena Analysis"
+abstract: >-
+  A comprehensive analysis of transient architectural phenomena in webserver
+  environments, investigating the impact of context switches and interrupts on
+  hardware performance counters (cache miss and TLB miss) through validation
+  tests and Docker-based webserver analysis. This research demonstrates significant
+  performance differences between table generation and matrix multiplication
+  servers, with degradation factors ranging from 1.15x to 420x depending on
+  workload characteristics and system architecture.
 authors:
-  - given-names: Lorenzo
-    family-names: Faraoni
+  - family-names: "Faraoni"
+    given-names: "Lorenzo"
     affiliation: "University of Siena"
+    email: "lorefara97@gmail.com"
+url: "https://github.com/Fara2106/transient-architectural-phenomena-analysis"
+repository-code: "https://github.com/Fara2106/transient-architectural-phenomena-analysis"
+keywords:
+  - computer-architecture
+  - performance-analysis
+  - cache-misses
+  - tlb-misses
+  - context-switches
+  - webserver-analysis
+  - docker
+  - performance-counters
+  - transient-phenomena
+  - system-performance
+license: MIT
+version: "1.0.0"
+date-released: 2024-08-06
+preferred-citation:
+  type: thesis
+  authors:
+    - family-names: "Faraoni"
+      given-names: "Lorenzo"
+      affiliation: "University of Siena"
+  title: "Analisi dei Fenomeni Architetturali Transienti"
+  year: 2024
+  institution:
+    name: "Università di Siena"
+    department: "Dipartimento di Ingegneria dell'Informazione e Scienze Matematiche"
+    city: "Siena"
+    country: "IT"
+  thesis-type: "Bachelor's thesis"  # Since you mentioned it's a "tesi triennale"
+  supervisors:
+    - family-names: "Bartolini"
+      given-names: "Sandro"
+      affiliation: "University of Siena"
+      role: "supervisor"
+  abstract: >-
+    Questa tesi analizza i fenomeni architetturali transienti attraverso 
+    un'analisi sistematica di due webserver in ambiente Docker. La ricerca 
+    dimostra come i pattern di accesso alla memoria influenzino drasticamente 
+    la vulnerabilità ai fenomeni transienti, con il server di moltiplicazione 
+    matriciale che manifesta degradazioni fino a 420x nelle cache miss L1, 
+    mentre il server di generazione tabelle mantiene prestazioni stabili con 
+    degradazioni massime di 3.2x.
+  keywords:
+    - fenomeni-architetturali-transienti
+    - analisi-prestazioni
+    - cache-miss
+    - tlb-miss
+    - context-switch
+    - architettura-calcolatori
+    - performance-counter
+    - docker
+    - webserver
+  url: "https://github.com/Fara2106/transient-architectural-phenomena-analysis"
