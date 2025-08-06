@@ -1,473 +1,305 @@
-# Analysis of Transient Architectural Phenomena
+# Transient Architectural Phenomena Analysis
 
-This repository contains the code and tools used for the thesis "Analisi dei Fenomeni Architetturali Transienti" (Analysis of Transient Architectural Phenomena) - University of Siena, Academic Year 2023-2024.
+**Analysis of Transient Architectural Phenomena in Webserver Environments**
 
-## 📋 Project Overview
+This repository contains the complete research project analyzing the impact of context switches and interrupts on hardware performance counters (cache miss and TLB miss) through validation tests and webserver analysis in Docker environments.
 
-This research analyzes the impact of transient architectural phenomena (caused by context switches and interrupts) on system performance through:
+## 🎓 Research Overview
 
-1. **Preliminary validation** with test programs to saturate cache and TLB
-2. **Experimental analysis** on two distinct web servers:
-   - HTML table generator server
-   - Matrix multiplication server
+This thesis research investigates transient architectural phenomena - temporary events that impact system performance due to interruptions in normal execution flow. The study focuses on how context switches and interrupts affect cache and TLB (Translation Lookaside Buffer) behavior in modern computer architectures.
 
 ### Key Findings
-- **Table server**: resilient to disturbances (max degradation 3.2x in L3 cache)
-- **Matrix server**: highly sensitive (degradation up to 420x in L1 cache, 5.3x in execution time)
-- Significant differences between single-core and multi-core configurations
+
+- **Table Server**: Resilient to disturbance (max degradation: 3.2x in L3 cache, 1.15x execution time)
+  - L1 Cache: ~35M stable misses, miss rate ~1.2%
+  - TLB L1: Counter-intuitive behavior (miss reduction with disturbance)
+  - Access pattern: Sequential distributed, benefits from TLB pre-loading
+
+- **Matrix Server**: Highly sensitive (degradation up to 420x in L1 cache, 5.3x execution time)
+  - L1 Cache: From 1.7M to 714M misses (400x increase)
+  - TLB L1: From 1.2M to 175M misses (145x increase)
+  - Access pattern: Intensive localized, quickly saturates cache
 
 ## 🏗️ Project Structure
 
 ```
-project/
-├── validation/                    # Validation programs
-│   ├── cache_analysis/           # Cache miss analysis
-│   │   ├── random_access_cache.cc
-│   │   ├── compile_cache.sh
-│   │   ├── run_cache_analysis.sh
-│   │   ├── results/              # Results organized by array size
-│   │   │   ├── cache_32KB.txt    # Results for 32KB array
-│   │   │   ├── cache_256KB.txt   # Results for 256KB array
-│   │   │   ├── cache_16MB.txt    # Results for 16MB array
-│   │   │   ├── time_32KB.txt     # Execution times for 32KB
-│   │   │   ├── time_256KB.txt    # Execution times for 256KB
-│   │   │   └── time_16MB.txt     # Execution times for 16MB
-│   │   ├── plot_cache.py
-│   │   └── graphs/
-│   │       ├── cache_miss_plot.png
-│   │       └── execution_time_plot.png
-│   └── tlb_analysis/             # TLB miss analysis
-│       ├── random_access_tlb.cc
-│       ├── compile_tlb.sh
-│       ├── run_tlb_analysis.sh
-│       ├── results/              # Results organized by page count
-│       │   ├── tlb_64pages.txt   # Results for 64 pages
-│       │   ├── tlb_1536pages.txt # Results for 1536 pages
-│       │   ├── tlb_4096pages.txt # Results for 4096 pages
-│       │   ├── time_64pages.txt  # Execution times for 64 pages
-│       │   ├── time_1536pages.txt # Execution times for 1536 pages
-│       │   └── time_4096pages.txt # Execution times for 4096 pages
-│       ├── plot_tlb.py
-│       └── graphs/
-│           ├── tlb_miss_plot.png
-│           └── execution_time_plot.png
-├── webserver_analysis/           # Web server analysis
-│   ├── table_server/            # Table generation server
-│   │   ├── single_core/
-│   │   │   ├── cache_miss/
-│   │   │   │   ├── client.cc
-│   │   │   │   ├── makefile
-│   │   │   │   ├── benchmark_cache.sh
-│   │   │   │   └── results/      # Results organized by disturbance type
-│   │   │   │       ├── misses_baseline.txt     # No disturbance
-│   │   │   │       ├── misses_1_LOWHZ.txt      # 1 disturbing server, low freq
-│   │   │   │       ├── misses_1_MEDIUMHZ.txt   # 1 disturbing server, medium freq
-│   │   │   │       ├── misses_1_HIGHHZ.txt     # 1 disturbing server, high freq
-│   │   │   │       ├── misses_2_LOWHZ.txt      # 2 disturbing servers, low freq
-│   │   │   │       ├── misses_2_MEDIUMHZ.txt   # 2 disturbing servers, medium freq
-│   │   │   │       └── misses_2_HIGHHZ.txt     # 2 disturbing servers, high freq
-│   │   │   ├── tlb_miss/
-│   │   │   │   ├── client.cc
-│   │   │   │   ├── makefile
-│   │   │   │   ├── benchmark_tlb.sh
-│   │   │   │   └── results/      # Results organized by disturbance type
-│   │   │   │       ├── tlb_baseline.txt        # No disturbance
-│   │   │   │       ├── tlb_1_LOWHZ.txt         # 1 disturbing server, low freq
-│   │   │   │       ├── tlb_1_MEDIUMHZ.txt      # 1 disturbing server, medium freq
-│   │   │   │       ├── tlb_1_HIGHHZ.txt        # 1 disturbing server, high freq
-│   │   │   │       ├── tlb_2_LOWHZ.txt         # 2 disturbing servers, low freq
-│   │   │   │       ├── tlb_2_MEDIUMHZ.txt      # 2 disturbing servers, medium freq
-│   │   │   │       └── tlb_2_HIGHHZ.txt        # 2 disturbing servers, high freq
-│   │   │   └── execution_time/
-│   │   │       ├── client.cc
-│   │   │       ├── makefile
-│   │   │       ├── benchmark_time.sh
-│   │   │       └── results/      # Execution times organized by disturbance type
-│   │   │           ├── time_baseline.txt       # No disturbance
-│   │   │           ├── time_1_LOWHZ.txt        # 1 disturbing server, low freq
-│   │   │           ├── time_1_MEDIUMHZ.txt     # 1 disturbing server, medium freq
-│   │   │           ├── time_1_HIGHHZ.txt       # 1 disturbing server, high freq
-│   │   │           ├── time_2_LOWHZ.txt        # 2 disturbing servers, low freq
-│   │   │           ├── time_2_MEDIUMHZ.txt     # 2 disturbing servers, medium freq
-│   │   │           └── time_2_HIGHHZ.txt       # 2 disturbing servers, high freq
-│   │   ├── multi_core/
-│   │   │   ├── cache_miss/
-│   │   │   │   └── results/      # Same structure as single_core
-│   │   │   ├── tlb_miss/
-│   │   │   │   └── results/
-│   │   │   └── execution_time/
-│   │   │       └── results/
+├── validation/                    # Validation phase tests
+│   ├── cache_analysis/            # Random access array cache tests
+│   │   ├── random_access_array.cc
+│   │   ├── compile.sh
+│   │   ├── run_perf_analysis_miss.sh
+│   │   ├── run_perf_analysis_time.sh
+│   │   ├── print_cache_miss.py
+│   │   ├── print_output_cache_time.py
+│   │   └── plots/
+│   └── tlb_analysis/              # Random access array TLB tests
+│       ├── random_access_array.cc
+│       ├── compile.sh
+│       ├── run_perf_analysis_miss.sh
+│       ├── run_perf_analysis_time.sh
+│       ├── print_tlb_misses.py
+│       ├── print_output_tlb_time.py
+│       └── plots/
+│
+├── webserver_analysis/           # Main webserver analysis
+│   ├── table_server/             # Table generation server
 │   │   ├── src/
-│   │   │   └── TableGenerator.java
-│   │   ├── WEB-INF/
-│   │   │   └── classes/
-│   │   ├── build_war.sh
-│   │   ├── table-generator.war
+│   │   │   ├── TableGenerator.java
+│   │   │   └── WEB-INF/
+│   │   ├── Dockerfile
+│   │   ├── build_image.sh
 │   │   ├── start_server.sh
-│   │   ├── disturb_low.sh        # 1 req/s
-│   │   ├── disturb_medium.sh     # 10 req/s
-│   │   ├── disturb_high.sh       # 100 req/s
-│   │   └── plot_table_results.py
-│   └── matrix_server/           # Matrix multiplication server
-│       ├── single_core/
-│       │   ├── cache_miss/
-│       │   │   ├── client.cc
-│       │   │   ├── makefile
-│       │   │   ├── benchmark_cache.sh
-│       │   │   └── results/      # Results organized by disturbance type
-│       │   │       ├── misses_baseline.txt     # No disturbance
-│       │   │       ├── misses_1_LOWHZ.txt      # 1 disturbing server, low freq
-│       │   │       ├── misses_1_MEDIUMHZ.txt   # 1 disturbing server, medium freq
-│       │   │       ├── misses_1_HIGHHZ.txt     # 1 disturbing server, high freq
-│       │   │       ├── misses_2_LOWHZ.txt      # 2 disturbing servers, low freq
-│       │   │       ├── misses_2_MEDIUMHZ.txt   # 2 disturbing servers, medium freq
-│       │   │       └── misses_2_HIGHHZ.txt     # 2 disturbing servers, high freq
-│       │   ├── tlb_miss/
-│       │   │   ├── client.cc
-│       │   │   ├── makefile
-│       │   │   ├── benchmark_tlb.sh
-│       │   │   └── results/      # Results organized by disturbance type
-│       │   │       ├── tlb_baseline.txt        # No disturbance
-│       │   │       ├── tlb_1_LOWHZ.txt         # 1 disturbing server, low freq
-│       │   │       ├── tlb_1_MEDIUMHZ.txt      # 1 disturbing server, medium freq
-│       │   │       ├── tlb_1_HIGHHZ.txt        # 1 disturbing server, high freq
-│       │   │       ├── tlb_2_LOWHZ.txt         # 2 disturbing servers, low freq
-│       │   │       ├── tlb_2_MEDIUMHZ.txt      # 2 disturbing servers, medium freq
-│       │   │       └── tlb_2_HIGHHZ.txt        # 2 disturbing servers, high freq
-│       │   └── execution_time/
-│       │       ├── client.cc
-│       │       ├── makefile
-│       │       ├── benchmark_time.sh
-│       │       └── results/      # Execution times organized by disturbance type
-│       │           ├── time_baseline.txt       # No disturbance
-│       │           ├── time_1_LOWHZ.txt        # 1 disturbing server, low freq
-│       │           ├── time_1_MEDIUMHZ.txt     # 1 disturbing server, medium freq
-│       │           ├── time_1_HIGHHZ.txt       # 1 disturbing server, high freq
-│       │           ├── time_2_LOWHZ.txt        # 2 disturbing servers, low freq
-│       │           ├── time_2_MEDIUMHZ.txt     # 2 disturbing servers, medium freq
-│       │           └── time_2_HIGHHZ.txt       # 2 disturbing servers, high freq
-│       ├── multi_core/
-│       │   ├── cache_miss/
-│       │   │   └── results/      # Same structure as single_core
-│       │   ├── tlb_miss/
-│       │   │   └── results/
-│       │   └── execution_time/
-│       │       └── results/
+│   │   ├── disturbator_low_frequency.sh
+│   │   ├── disturbator_medium_frequency.sh
+│   │   ├── disturbator_high_frequency.sh
+│   │   └── plot_all.py
+│   └── matrix_server/            # Matrix multiplication server
 │       ├── src/
-│       │   └── MatrixMultiplier.java
-│       ├── WEB-INF/
-│       │   └── classes/
-│       ├── build_war.sh
-│       ├── matrix-multiplier.war
+│       │   ├── MatrixMultiplier.java
+│       │   └── WEB-INF/
+│       ├── Dockerfile
+│       ├── build_image.sh
 │       ├── start_server.sh
-│       ├── disturb_low.sh        # 1 req/s
-│       ├── disturb_medium.sh     # 5 req/s
-│       ├── disturb_high.sh       # 10 req/s
-│       └── plot_matrix_results.py
-└── final_results/               # Consolidated results and final graphs
-    ├── validation_graphs/
-    │   ├── cache_validation.png
-    │   └── tlb_validation.png
-    ├── comparison_graphs/
-    │   ├── table_vs_matrix_single.png
-    │   ├── table_vs_matrix_multi.png
-    │   └── single_vs_multi_comparison.png
-    └── thesis_graphs/          # All graphs used in the thesis
+│       ├── disturbator_low_frequency.sh
+│       ├── disturbator_medium_frequency.sh
+│       ├── disturbator_high_frequency.sh
+│       └── plot_all.py
+│
+├── results/                      # Experimental results
+│   ├── table_generator/          # Table server results
+│   │   ├── single_core/
+│   │   └── multi_core/
+│   └── matrix_multiplication/    # Matrix server results
+│       ├── single_core/
+│       └── multi_core/
+│
+├── client_analysis/              # Client implementation and analysis
+│   ├── cache_misses/
+│   ├── execution_time/
+│   └── tlb_misses/
+│
+├── docs/                         # Documentation and thesis
+│   ├── thesis_presentation.pdf
+│   ├── thesis_document.pdf
+│   └── images/
+│
+└── scripts/                      # Automation scripts
+    ├── setup.sh
+    ├── run_all_tests.sh
+    └── data_processing/
 ```
 
-## 🔧 System Requirements
+## 🛠️ System Requirements
 
-### Hardware
-- Processor with performance counter support (Intel/AMD)
-- Multi-core architecture recommended
-- RAM: minimum 8GB recommended
+### Hardware Specifications (Test Environment)
+- **CPU**: Intel Core i9-9900K (8 physical cores, 16 logical)
+- **Cache**: L1 32KB, L2 256KB, L3 16MB
+- **TLB**: L1 64 pages, L2 1536 pages
+- **RAM**: 32GB
 
-### Software
-- **Operating System**: Linux (tested on Ubuntu with kernel 5.4.0-150-generic)
-- **Java**: JDK 1.7 or higher
-- **Apache Tomcat**: servlet-compatible version
-- **Docker**: 20.10.21 or higher
-- **GCC**: for C++ client compilation
-- **Python**: 3.x with matplotlib
-- **C++ Libraries**: libcurl-dev
-- **System Tools**: perf (included in Linux kernel)
+### Software Environment
+- **OS**: Linux kernel 5.4.0-150-generic
+- **Docker**: 20.10.21
+- **Java**: OpenJDK 11+ (for servlet containers)
+- **Apache Tomcat**: 9.x
+- **Tools**: perf, GCC, Python 3.x with matplotlib
 
-### Dependencies Installation (Ubuntu/Debian)
+### Performance Counter Events Monitored
+
+**Cache Events:**
+- `mem_load_retired.l1_miss` - L1 cache misses
+- `mem_load_retired.l2_miss` - L2 cache misses  
+- `mem_load_retired.l3_miss` - L3 cache misses
+
+**TLB Events:**
+- `dtlb_load_misses.stlb_hit` - L1 TLB load misses
+- `dtlb_store_misses.stlb_hit` - L1 TLB store misses
+- `dtlb_load_misses.miss_causes_a_walk` - L2 TLB load misses
+- `dtlb_store_misses.miss_causes_a_walk` - L2 TLB store misses
+
+## 🚀 Quick Start
+
+### 1. Clone the Repository
 ```bash
-# Update system
-sudo apt update
-
-# Install Java and build tools
-sudo apt install openjdk-8-jdk gcc make
-
-# Install libcurl for HTTP clients
-sudo apt install libcurl4-openssl-dev
-
-# Install Python and matplotlib
-sudo apt install python3 python3-pip
-pip3 install matplotlib
-
-# Install Docker
-sudo apt install docker.io
-sudo systemctl start docker
-sudo usermod -aG docker $USER
-
-# Install Apache Tomcat
-sudo apt install tomcat9
+git clone https://github.com/Fara2106/transient-architectural-phenomena-analysis.git
+cd transient-architectural-phenomena-analysis
 ```
 
-## 🔐 Administrator Permissions Required
-
-**Important**: This project requires administrator privileges to access hardware performance counters through `perf`.
-
-### Option 1: Configure perf permissions (Recommended)
+### 2. Setup Environment
 ```bash
-# Allow unprivileged access to perf events
-echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid
-
-# Make permanent by adding to /etc/sysctl.conf
-echo "kernel.perf_event_paranoid = -1" | sudo tee -a /etc/sysctl.conf
+chmod +x scripts/setup.sh
+./scripts/setup.sh
 ```
 
-### Option 2: Run with sudo
+### 3. Run Validation Tests
 ```bash
-# Run all benchmark scripts with sudo
-sudo ./benchmark_cache.sh
-sudo ./benchmark_tlb.sh
+# Cache validation
+cd validation/cache_analysis
+./compile.sh
+./run_perf_analysis_miss.sh
+python3 print_cache_miss.py
+
+# TLB validation  
+cd ../tlb_analysis
+./compile.sh
+./run_perf_analysis_miss.sh
+python3 print_tlb_misses.py
 ```
 
-### Security Note
-The perf tool accesses low-level hardware counters. Ensure you understand the security implications before modifying system permissions.
-
-## 🚀 Usage Guide
-
-### 1. Validation Phase
-
-#### Cache Miss Analysis
+### 4. Webserver Analysis
 ```bash
-cd validation/cache_analysis/
-./compile_cache.sh
-sudo ./run_cache_analysis.sh
-python3 plot_cache.py
-```
+# Table server
+cd webserver_analysis/table_server
+./build_image.sh
+./start_server.sh
 
-#### TLB Miss Analysis
-```bash
-cd validation/tlb_analysis/
-./compile_tlb.sh
-sudo ./run_tlb_analysis.sh
-python3 plot_tlb.py
-```
+# In another terminal - start client analysis
+cd client_analysis/table_generator/cache_misses
+make
+./cache_miss.sh
 
-### 2. Web Server Analysis
-
-#### Table Server Setup
-```bash
-cd webserver_analysis/table_server/
-./build_war.sh
+# Matrix server
+cd webserver_analysis/matrix_server
+./build_image.sh
 ./start_server.sh
 ```
 
-#### Single-Core Test Execution
-```bash
-cd single_core/cache_miss/
+## 📊 Test Configurations
 
-# Test without disturbance
-sudo ./benchmark_cache.sh
-
-# Test with low disturbance (in separate terminals)
-../../disturb_low.sh &
-sudo ./benchmark_cache.sh
-
-# Test with medium disturbance
-../../disturb_medium.sh &
-sudo ./benchmark_cache.sh
-
-# Test with high disturbance
-../../disturb_high.sh &
-sudo ./benchmark_cache.sh
-```
-
-#### Multi-Core Test Execution
-```bash
-cd multi_core/cache_miss/
-
-# Follow same pattern as single-core
-# Tests will automatically utilize multiple cores
-```
-
-#### Test Configurations
-
-**Table Server:**
-- Dimensions: 10,000 - 1,000,000 rows
-- Disturbance frequencies: 1, 10, 100 requests/second
-
-**Matrix Server:**
-- Dimensions: 1x1 - 4096x4096
-- Disturbance frequencies: 1, 5, 10 requests/second
-
-### 3. Results Analysis
-```bash
-# Generate graphs from results
-python3 plot_table_results.py  # For table server analysis
-python3 plot_matrix_results.py # For matrix server analysis
-
-# Graphs are saved in respective results/ folders
-```
-
-## 📊 File Structure and Content
-
-### Validation Results
-Each validation test generates results organized by data structure size:
-- **Cache analysis**: Results for different array sizes (32KB, 256KB, 16MB, etc.)
-- **TLB analysis**: Results for different page counts (64, 1536, 4096 pages, etc.)
-
-### Webserver Results  
-Each webserver test generates results organized by disturbance configuration:
-
-**File naming convention:**
-- `baseline`: Test server only (no disturbance)
-- `1_LOWHZ`: Test server + 1 disturbing server at low frequency  
-- `1_MEDIUMHZ`: Test server + 1 disturbing server at medium frequency
-- `1_HIGHHZ`: Test server + 1 disturbing server at high frequency
-- `2_LOWHZ`: Test server + 2 disturbing servers at low frequency
-- `2_MEDIUMHZ`: Test server + 2 disturbing servers at medium frequency  
-- `2_HIGHHZ`: Test server + 2 disturbing servers at high frequency
-
-## 📊 Monitored Metrics
-
-### Hardware Performance Counters (perf)
-- **Cache Miss**: L1, L2, L3 levels
-- **TLB Miss**: L1, L2 levels
-- **Execution time**
-- **Throughput** (requests/second)
-
-### Perf Events Used
-```bash
-# Cache events
-mem_load_retired.l1_miss
-mem_load_retired.l2_miss
-mem_load_retired.l3_miss
-
-# TLB events
-dtlb_load_misses.stlb_hit
-dtlb_store_misses.stlb_hit
-dtlb_load_misses.miss_causes_a_walk
-dtlb_store_misses.miss_causes_a_walk
-```
-
-## 🔬 Methodology
-
-### Hardware Configuration Tested
-- **CPU**: Intel Core i9-9900K (8 physical cores, 16 logical)
-- **L1 Cache**: 32 KB
-- **L2 Cache**: 256 KB  
-- **L3 Cache**: 16 MB
-- **L1 TLB**: 64 pages
-- **L2 TLB**: 1536 pages
-
-### Test Scenarios
-1. **Baseline**: test server only (no disturbance)
-2. **Low disturbance**: test server + 1 disturbing server
-3. **Medium disturbance**: test server + 2 disturbing servers
-4. **High disturbance**: test server + 2 disturbing servers (at maximum frequency)
-
-## 📈 Expected Results
-
-### Table Generation Server
-- Stable cache misses (~35M L1, ~11M L2)
-- Decreasing TLB misses with disturbance
-- Contained performance degradation (1.15x)
+### Table Generator Server
+- **Test sizes**: 10,000 - 1,000,000 rows
+- **Disturbance server**: 10,000 rows (3MB)
+- **Frequencies**: 
+  - Low: 1 req/s
+  - Medium: 10 req/s  
+  - High: 100 req/s
 
 ### Matrix Multiplication Server
-- Dramatically increasing cache misses (420x L1)
-- Significantly increasing TLB misses (142x L1)
-- Marked performance degradation (5.3x)
+- **Test sizes**: 1 - 4096 (matrix dimensions)
+- **Disturbance server**: 256x256 matrices (768KB)
+- **Frequencies**:
+  - Low: 1 req/s
+  - Medium: 5 req/s
+  - High: 10 req/s
 
-## ⚠️ Important Notes
+### Container Configurations
+- **Single-core**: `--cpuset-cpus="0" --cpus=1`
+- **Multi-core**: Full CPU utilization
 
-### System Configuration for Consistent Results
+## 📈 Key Results Summary
+
+### Performance Comparison (Maximum Load)
+
+| Parameter | Table Server (1M rows) | Matrix Server (4096x4096) |
+|-----------|-------------------------|---------------------------|
+| L1 Cache Miss | 35M → 35M (~1x) | 1.7M → 714M (420x) |
+| L2 Cache Miss | 11M → 11M (~1x) | 1.2M → 11.9M (~10x) |
+| L3 Cache Miss | 0.14M → 0.45M (3.2x) | 4K → 0.14M (140x) |
+| TLB L1 Miss | 20M → 11.7M (↓40%) | 1.2M → 170M (142x) |
+| TLB L2 Miss | 1M → 0.7M (↓30%) | 0.5M → 0.44M (~1x) |
+| Execution Time | 0.153s → 0.176s (1.15x) | 410s → 2162s (5.3x) |
+
+## 🔬 Research Methodology
+
+1. **Validation Phase**: Random access array tests to validate performance counters
+2. **Baseline Establishment**: Single server performance measurement
+3. **Disturbance Analysis**: Progressive load increase with 1-3 concurrent servers
+4. **Architecture Comparison**: Single-core vs multi-core behavior analysis
+5. **Performance Correlation**: Mapping between architectural events and performance
+
+## 📝 Usage Examples
+
+### Running Cache Analysis
 ```bash
-# Disable CPU frequency scaling
-echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+cd validation/cache_analysis
+./compile.sh
 
-# Disable CPU idle states (optional, for maximum consistency)
-sudo cpupower idle-set -D 0
+# Test different array sizes (2^15 to 2^24 bytes)
+for size in {15..24}; do
+    echo "Testing size: 2^$size bytes"
+    perf stat -e mem_load_retired.l1_miss,mem_load_retired.l2_miss,mem_load_retired.l3_miss \
+    ./random_access_array $size > output_$size.txt 2>&1
+done
+
+python3 print_cache_miss.py
 ```
 
-### Best Practices
-- Close unnecessary applications during tests
-- Run multiple iterations to validate results
-- Monitor system temperature to avoid thermal throttling
-- Ensure adequate cooling during intensive tests
-
-### Hardware Adaptation
-Cache and TLB parameters are configurable in test files to adapt to different hardware architectures. Modify the following in validation programs:
-- Cache sizes (L1: 32KB, L2: 256KB, L3: 16MB)
-- TLB capacities (L1: 64 pages, L2: 1536 pages)
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Permission denied with perf:**
+### Webserver Load Testing
 ```bash
-# Check current perf_event_paranoid setting
-cat /proc/sys/kernel/perf_event_paranoid
-# If > -1, follow permission setup above
+# Start table server
+cd webserver_analysis/table_server
+./start_server.sh
+
+# Generate load in separate terminals
+./disturbator_low_frequency.sh &
+./disturbator_medium_frequency.sh &
+./disturbator_high_frequency.sh &
+
+# Monitor with perf
+cd ../../client_analysis/table_generator/cache_misses
+perf stat -e mem_load_retired.l1_miss,mem_load_retired.l2_miss,mem_load_retired.l3_miss \
+./send_request http://localhost:8080/table-generator 100000
 ```
 
-**Docker permission issues:**
+## 📊 Data Analysis
+
+The `results/` directory contains comprehensive experimental data:
+- Raw performance counter measurements
+- Execution time recordings
+- Statistical analysis plots
+- Comparative performance charts
+
+Use the provided Python scripts to regenerate plots:
 ```bash
-# Add user to docker group and restart
-sudo usermod -aG docker $USER
-# Log out and log back in
+cd results/table_generator/plots
+python3 plot_cache_analysis.py
+python3 plot_performance_comparison.py
 ```
 
-**Tomcat not starting:**
-```bash
-# Check if port 8080 is available
-sudo netstat -tlnp | grep 8080
-# Kill conflicting processes if necessary
+## 🤝 Contributing
+
+This is a research project completed for academic purposes. However, contributions and discussions are welcome:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/analysis-improvement`)
+3. Commit your changes (`git commit -am 'Add new analysis method'`)
+4. Push to the branch (`git push origin feature/analysis-improvement`)
+5. Create a Pull Request
+
+## 📚 Academic Citation
+
+If you use this work in your research, please cite:
+
+```bibtex
+@mastersthesis{faraoni2024transient,
+  title={Analisi dei Fenomeni Architetturali Transienti},
+  author={Faraoni, Lorenzo},
+  year={2024},
+  school={Università di Siena},
+  department={Dipartimento di Ingegneria dell'Informazione e Scienze Matematiche},
+  type={Tesi di Laurea in Ingegneria Informatica e dell'Informazione},
+  supervisor={Bartolini, Sandro}
+}
 ```
 
-**Inconsistent results:**
-- Ensure system is not under thermal stress
-- Disable background services and applications
-- Run tests multiple times and average results
+## 🔗 Connect
 
-## 📚 References
-
-- Full thesis: "Analisi dei Fenomeni Architetturali Transienti"
-- University of Siena - Department of Information Engineering and Mathematical Sciences
-- Supervisor: Prof. Sandro Bartolini
-- Academic Year: 2023-2024
-
-## 🎯 Research Impact
-
-This research contributes to understanding transient architectural phenomena in modern computing systems, with applications in:
-- **Performance optimization** of web servers
-- **Resource allocation** in virtualized environments
-- **System design** for high-throughput applications
-- **Benchmarking methodology** for architectural analysis
-
-## 👨‍💻 Author
-
-**Lorenzo Faraoni**  
-Laurea in Computer and Information Engineering  
-University of Siena  
-
-📧 Email: lorefara97@gmail.com  
-🔗 LinkedIn: https://www.linkedin.com/in/lorenzo-faraoni-881340262/
+- **Author**: Lorenzo Faraoni
+- **LinkedIn**: [lorenzo-faraoni-881340262](https://www.linkedin.com/in/lorenzo-faraoni-881340262/)
+- **Instagram**: [@lore_fara](https://www.instagram.com/lore_fara/)
+- **University**: University of Siena, Italy
 
 ## 📄 License
 
-This project is available for academic and research purposes. Please cite the original thesis when using this work.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-Special thanks to Prof. Sandro Bartolini for supervision and guidance throughout this research project.
+- Prof. Sandro Bartolini (Thesis Supervisor) - University of Siena
+- Department of Information Engineering and Mathematical Sciences
+- University of Siena Computing Infrastructure
+- Research community for open-source tools and methodologies
 
 ---
 
-*For questions or clarifications about the code, please refer to the thesis documentation or contact the author.*
+*This research contributes to the understanding of transient architectural phenomena in modern computing systems, providing insights for performance optimization in server environments.*
