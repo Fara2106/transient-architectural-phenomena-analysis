@@ -74,18 +74,22 @@ This thesis research investigates transient architectural phenomena - temporary 
 │       └── multi_core/
 │
 ├── client_analysis/              # Client implementation and analysis
-│   ├── cache_misses/
-│   ├── execution_time/
-│   └── tlb_misses/
+│   ├── table_generator/
+│   │   ├── cache_misses/
+│   │   ├── execution_time/
+│   │   └── tlb_misses/
+│   └── matrix_multiplication/
+│       ├── cache_misses/
+│       ├── execution_time/
+│       └── tlb_misses/
 │
-├── docs/                         # Documentation and thesis
-│   ├── thesis_presentation.pdf
-│   ├── thesis_document.pdf
+├── docs/                         # Documentation and technical images
 │   └── images/
 │
 └── scripts/                      # Automation scripts
     ├── setup.sh
-    ├── run_all_tests.sh
+    ├── install.sh
+    ├── javax.servlet-api.jar
     └── data_processing/
 ```
 
@@ -127,8 +131,8 @@ cd transient-architectural-phenomena-analysis
 
 ### 2. Setup Environment
 ```bash
-chmod +x scripts/setup.sh
-./scripts/setup.sh
+chmod +x scripts/install.sh
+./scripts/install.sh
 ```
 
 ### 3. Run Validation Tests
@@ -251,10 +255,18 @@ The `results/` directory contains comprehensive experimental data:
 
 Use the provided Python scripts to regenerate plots:
 ```bash
-cd results/table_generator/plots
-python3 plot_cache_analysis.py
-python3 plot_performance_comparison.py
+cd webserver_analysis/table_server
+python3 plot_all.py
+
+cd ../matrix_server  
+python3 plot_all.py
 ```
+
+## 📚 Academic Thesis
+
+This repository contains the complete codebase for the master's thesis **"Analisi dei Fenomeni Architetturali Transienti"** (University of Siena, 2024). The research demonstrates significant performance differences between table generation and matrix multiplication servers under transient architectural phenomena.
+
+**For the complete academic document, thesis presentation, or detailed methodology, please contact the author.**
 
 ## 🤝 Contributing
 
